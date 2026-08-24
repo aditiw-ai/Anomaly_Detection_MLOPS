@@ -1,0 +1,30 @@
+ID: dc69d939-d350-4fb8-ab16-c40212c37fd0
+Name: Fraudulent_E-Commerce_Transaction_Data
+Row Count: 453857
+Storage Path: datasets/raw/raw_20260403T173915Z_859c2348/data.csv
+File Size: 38646536 bytes
+----------------------------------------
+ID: 08b01aef-5b19-4d2a-864f-a5871a367797
+Name: Merge of Fraudulent_E-Commerce_Transaction_Data, Fraudulent_E-Commerce_Transaction_Data_2 (Test Split)
+Row Count: 214442
+Storage Path: datasets/processed/split_20260331T160855Z_2c5fd92d/test/data.parquet
+File Size: 22538616 bytes
+----------------------------------------
+ID: c8fbc9fb-02ac-48f0-8ca7-1b5af41b4f35
+Name: Merge of Fraudulent_E-Commerce_Transaction_Data, Fraudulent_E-Commerce_Transaction_Data_2 (Train Split)
+Row Count: 857767
+Storage Path: datasets/processed/split_20260331T160855Z_2c5fd92d/train/data.parquet
+File Size: 89287582 bytes
+----------------------------------------
+ID: b7e62f70-cf3f-44ba-b7d7-e8b4f2681045
+Name: Merge of Fraudulent_E-Commerce_Transaction_Data, Fraudulent_E-Commerce_Transaction_Data_2 (Test Split)
+Row Count: 214442
+Storage Path: datasets/processed/split_20260331T160338Z_ba0e4a05/test/data.parquet
+File Size: 22538616 bytes
+----------------------------------------
+ID: ed19a1d2-26c3-4c1b-85cf-8d0b6c4894f7
+Name: Merge of Fraudulent_E-Commerce_Transaction_Data, Fraudulent_E-Commerce_Transaction_Data_2 (Train Split)
+Row Count: 857767
+Storage Path: datasets/processed/split_20260331T160338Z_ba0e4a05/train/data.parquet
+File Size: 89287582 bytes
+----------------------------------------

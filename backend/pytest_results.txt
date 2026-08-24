@@ -1,0 +1,313 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.0.2, pluggy-1.6.0 -- D:\Fraud_Detection_MLOPS_Platform\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Fraud_Detection_MLOPS_Platform\backend
+configfile: pyproject.toml
+plugins: anyio-4.12.1
+collecting ... collected 21 items
+
+tests/services/test_training_service.py::test_list_training_jobs_no_filter FAILED [  4%]
+tests/services/test_training_service.py::test_list_training_jobs_with_status_filter FAILED [  9%]
+tests/services/test_training_service.py::test_get_training_job_found FAILED [ 14%]
+tests/services/test_training_service.py::test_get_training_job_not_found FAILED [ 19%]
+tests/services/test_training_service.py::test_get_training_job_invalid_uuid FAILED [ 23%]
+tests/services/test_training_service.py::test_create_training_job_queues_celery FAILED [ 28%]
+tests/services/test_training_service.py::test_create_training_job_processing_only FAILED [ 33%]
+tests/services/test_training_service.py::test_delete_training_job_found FAILED [ 38%]
+tests/services/test_training_service.py::test_delete_training_job_not_found FAILED [ 42%]
+tests/services/test_training_service.py::test_list_algorithms FAILED     [ 47%]
+tests/services/test_training_service.py::test_get_default_hyperparameters_valid FAILED [ 52%]
+tests/services/test_training_service.py::test_get_default_hyperparameters_invalid FAILED [ 57%]
+tests/services/test_training_service.py::test_list_models FAILED         [ 61%]
+tests/services/test_training_service.py::test_get_model_found FAILED     [ 66%]
+tests/services/test_training_service.py::test_get_model_invalid_uuid FAILED [ 71%]
+tests/services/test_training_service.py::test_promote_model_to_production_demotes_current FAILED [ 76%]
+tests/services/test_training_service.py::test_get_production_model FAILED [ 80%]
+tests/services/test_training_service.py::test_set_baselines_success FAILED [ 85%]
+tests/services/test_training_service.py::test_set_baselines_not_found FAILED [ 90%]
+tests/services/test_training_service.py::test_delete_model_hard_delete FAILED [ 95%]
+tests/services/test_training_service.py::test_delete_model_not_found FAILED [100%]
+
+================================== FAILURES ===================================
+______________________ test_list_training_jobs_no_filter ______________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_________________ test_list_training_jobs_with_status_filter __________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_________________________ test_get_training_job_found _________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_______________________ test_get_training_job_not_found _______________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_____________________ test_get_training_job_invalid_uuid ______________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+___________________ test_create_training_job_queues_celery ____________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+__________________ test_create_training_job_processing_only ___________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_______________________ test_delete_training_job_found ________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_____________________ test_delete_training_job_not_found ______________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+____________________________ test_list_algorithms _____________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+___________________ test_get_default_hyperparameters_valid ____________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+__________________ test_get_default_hyperparameters_invalid ___________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+______________________________ test_list_models _______________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+____________________________ test_get_model_found _____________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_________________________ test_get_model_invalid_uuid _________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+______________ test_promote_model_to_production_demotes_current _______________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+__________________________ test_get_production_model __________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_________________________ test_set_baselines_success __________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+________________________ test_set_baselines_not_found _________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+________________________ test_delete_model_hard_delete ________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+_________________________ test_delete_model_not_found _________________________
+async def functions are not natively supported.
+You need to install a suitable plugin for your async framework, for example:
+  - anyio
+  - pytest-asyncio
+  - pytest-tornasync
+  - pytest-trio
+  - pytest-twisted
+============================== warnings summary ===============================
+..\.venv\Lib\site-packages\_pytest\config\__init__.py:1428
+  D:\Fraud_Detection_MLOPS_Platform\.venv\Lib\site-packages\_pytest\config\__init__.py:1428: PytestConfigWarning: Unknown config option: asyncio_mode
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+tests\services\test_training_service.py:57
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:57: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:80
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:80: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:104
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:104: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:121
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:121: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:134
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:134: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:147
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:147: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:185
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:185: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:226
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:226: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:242
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:242: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:260
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:260: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:271
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:271: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:281
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:281: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:293
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:293: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:324
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:324: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:342
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:342: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:355
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:355: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:391
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:391: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:413
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:413: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:445
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:445: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:460
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:460: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests\services\test_training_service.py:486
+  D:\Fraud_Detection_MLOPS_Platform\backend\tests\services\test_training_service.py:486: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/services/test_training_service.py::test_list_training_jobs_no_filter
+FAILED tests/services/test_training_service.py::test_list_training_jobs_with_status_filter
+FAILED tests/services/test_training_service.py::test_get_training_job_found
+FAILED tests/services/test_training_service.py::test_get_training_job_not_found
+FAILED tests/services/test_training_service.py::test_get_training_job_invalid_uuid
+FAILED tests/services/test_training_service.py::test_create_training_job_queues_celery
+FAILED tests/services/test_training_service.py::test_create_training_job_processing_only
+FAILED tests/services/test_training_service.py::test_delete_training_job_found
+FAILED tests/services/test_training_service.py::test_delete_training_job_not_found
+FAILED tests/services/test_training_service.py::test_list_algorithms - Failed...
+FAILED tests/services/test_training_service.py::test_get_default_hyperparameters_valid
+FAILED tests/services/test_training_service.py::test_get_default_hyperparameters_invalid
+FAILED tests/services/test_training_service.py::test_list_models - Failed: as...
+FAILED tests/services/test_training_service.py::test_get_model_found - Failed...
+FAILED tests/services/test_training_service.py::test_get_model_invalid_uuid
+FAILED tests/services/test_training_service.py::test_promote_model_to_production_demotes_current
+FAILED tests/services/test_training_service.py::test_get_production_model - F...
+FAILED tests/services/test_training_service.py::test_set_baselines_success - ...
+FAILED tests/services/test_training_service.py::test_set_baselines_not_found
+FAILED tests/services/test_training_service.py::test_delete_model_hard_delete
+FAILED tests/services/test_training_service.py::test_delete_model_not_found
+======================= 21 failed, 22 warnings in 2.40s =======================
