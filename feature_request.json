@@ -1,0 +1,13 @@
+﻿{
+  "dataset_id": "639e8994-9070-4853-8ac8-dd51b8f3d1b1",
+  "name": "anomaly_features_v1",
+  "description": "Feature set for anomaly detection model training",
+  "column_mapping": null,
+  "transaction_features": false,
+  "behavioral_features": false,
+  "temporal_features": false,
+  "aggregation_features": false,
+  "aggregation_windows": [],
+  "enable_feature_selection": true,
+  "max_features": 30
+}

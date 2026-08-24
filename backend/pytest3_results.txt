@@ -1,0 +1,32 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.0.2, pluggy-1.6.0 -- D:\Fraud_Detection_MLOPS_Platform\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Fraud_Detection_MLOPS_Platform\backend
+configfile: pyproject.toml
+plugins: anyio-4.12.1, asyncio-1.3.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 21 items
+
+tests/services/test_training_service.py::test_list_training_jobs_no_filter PASSED [  4%]
+tests/services/test_training_service.py::test_list_training_jobs_with_status_filter PASSED [  9%]
+tests/services/test_training_service.py::test_get_training_job_found PASSED [ 14%]
+tests/services/test_training_service.py::test_get_training_job_not_found PASSED [ 19%]
+tests/services/test_training_service.py::test_get_training_job_invalid_uuid PASSED [ 23%]
+tests/services/test_training_service.py::test_create_training_job_queues_celery PASSED [ 28%]
+tests/services/test_training_service.py::test_create_training_job_processing_only PASSED [ 33%]
+tests/services/test_training_service.py::test_delete_training_job_found PASSED [ 38%]
+tests/services/test_training_service.py::test_delete_training_job_not_found PASSED [ 42%]
+tests/services/test_training_service.py::test_list_algorithms PASSED     [ 47%]
+tests/services/test_training_service.py::test_get_default_hyperparameters_valid PASSED [ 52%]
+tests/services/test_training_service.py::test_get_default_hyperparameters_invalid PASSED [ 57%]
+tests/services/test_training_service.py::test_list_models PASSED         [ 61%]
+tests/services/test_training_service.py::test_get_model_found PASSED     [ 66%]
+tests/services/test_training_service.py::test_get_model_invalid_uuid PASSED [ 71%]
+tests/services/test_training_service.py::test_promote_model_to_production_demotes_current PASSED [ 76%]
+tests/services/test_training_service.py::test_get_production_model PASSED [ 80%]
+tests/services/test_training_service.py::test_set_baselines_success PASSED [ 85%]
+tests/services/test_training_service.py::test_set_baselines_not_found PASSED [ 90%]
+tests/services/test_training_service.py::test_delete_model_hard_delete PASSED [ 95%]
+tests/services/test_training_service.py::test_delete_model_not_found PASSED [100%]
+
+============================= 21 passed in 15.38s =============================

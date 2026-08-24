@@ -1,0 +1,12 @@
+Exact physical newline characters in the file: 704846
+Total file size in bytes: 38646536
+Pandas parsed row count: 453857
+Pandas parsed column count: 16
+
+First 3 rows:
+                         Transaction ID  ... Transaction Hour
+0  fc7a00c3-556e-4d15-ad56-9da915dccbbd  ...              0.0
+1  29602249-6ded-486d-9165-6cd1ba797bd4  ...              0.0
+2  8401228f-f19b-4f06-97be-0375f6451cee  ...              8.0
+
+[3 rows x 16 columns]
