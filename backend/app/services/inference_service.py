@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -103,6 +104,41 @@ class InferenceService:
         if not artifact_path.exists() or artifact_path.is_dir():
             return None
         return artifact_path.read_bytes()
+
+    @staticmethod
+    def _select_stage2_model(candidates: List[MLModel]) -> Optional[MLModel]:
+        """Pick the current multiclass anomaly-type model deterministically."""
+        stage2_candidates = []
+        for candidate in candidates:
+            hyperparameters = candidate.hyperparameters if isinstance(candidate.hyperparameters, dict) else {}
+            is_stage2 = hyperparameters.get("training_stage") == "anomaly_type"
+            is_multiclass = (
+                str(hyperparameters.get("objective", "")).startswith("multi:")
+                or int(hyperparameters.get("num_class") or 0) > 2
+            )
+            if is_stage2 and is_multiclass:
+                stage2_candidates.append(candidate)
+
+        if not stage2_candidates:
+            return None
+
+        status_rank = {"PRODUCTION": 0, "STAGING": 1, "TRAINED": 2}
+
+        def sort_key(candidate: MLModel):
+            created_at = candidate.created_at or datetime.min
+            created_rank = (
+                created_at.toordinal(),
+                created_at.hour,
+                created_at.minute,
+                created_at.second,
+                created_at.microsecond,
+            )
+            return (
+                status_rank.get(candidate.status, 99),
+                tuple(-part for part in created_rank),
+            )
+
+        return sorted(stage2_candidates, key=sort_key)[0]
     
     _instance: Optional["InferenceService"] = None
     
@@ -325,14 +361,7 @@ class InferenceService:
             stage2_result = await db.execute(
                 select(MLModel).where(MLModel.status.in_(['STAGING', 'PRODUCTION', 'TRAINED']))
             )
-            stage2_model = next(
-                (
-                    candidate for candidate in stage2_result.scalars().all()
-                    if isinstance(candidate.hyperparameters, dict)
-                    and candidate.hyperparameters.get("training_stage") == "anomaly_type"
-                ),
-                None,
-            )
+            stage2_model = self._select_stage2_model(stage2_result.scalars().all())
             if stage2_model is not None:
                 self._stage2_service = InferenceService()
                 await self._stage2_service.load_model(str(stage2_model.id), db, _load_stage2=False)
