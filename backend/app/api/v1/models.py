@@ -19,6 +19,8 @@ from app.core.auth import User, Permission
 from app.services.training_service import ModelService
 from app.services.classification_model_service import ClassificationModelService
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/models", tags=["Models"])
 
 

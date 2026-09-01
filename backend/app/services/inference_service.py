@@ -117,6 +117,7 @@ class InferenceService:
         self._use_onnx: bool = False
         self._optimal_threshold: float = 0.5  # Loaded from manifest; corrects scale_pos_weight bias
         self._stage2_service: Optional["InferenceService"] = None
+        self._training_stage: str = "binary"
     
     @classmethod
     def get_instance(cls) -> "InferenceService":
@@ -180,6 +181,8 @@ class InferenceService:
         self._calibrator = None
         self._use_onnx = False
         self._optimal_threshold = 0.5  # Default; overridden by manifest if present
+        model_hyperparameters = model.hyperparameters if isinstance(model.hyperparameters, dict) else {}
+        self._training_stage = model_hyperparameters.get("training_stage", "binary")
 
         azure_configured = bool((settings.AZURE_STORAGE_CONNECTION_STRING or "").strip())
         if not azure_configured:
@@ -318,7 +321,7 @@ class InferenceService:
 
         logger.info(f"Model {model_id} loaded via {'ONNX' if self._use_onnx else 'pickle'} | threshold={self._optimal_threshold:.4f} | calibrated={self._calibrator is not None}")
 
-        if _load_stage2 and model.hyperparameters.get("training_stage") != "anomaly_type":
+        if _load_stage2 and self._training_stage != "anomaly_type":
             stage2_result = await db.execute(
                 select(MLModel).where(MLModel.status.in_(['STAGING', 'PRODUCTION', 'TRAINED']))
             )
@@ -383,6 +386,42 @@ class InferenceService:
         if probabilities is None:
             return int(self._pipeline.predict(df)[0])
         return int(np.argmax(probabilities))
+
+    def _predict_stage2_direct(self, features: Dict[str, Any], start: float) -> Dict[str, Any]:
+        """Return a direct anomaly-type classification for a loaded Stage 2 model."""
+        df = pd.DataFrame([features])
+        if self._use_onnx:
+            if self._preprocessor is not None:
+                transformed = self._preprocessor.transform(df)
+                feature_array = (
+                    transformed.values.astype(np.float32)
+                    if isinstance(transformed, pd.DataFrame)
+                    else np.array(transformed, dtype=np.float32)
+                )
+            else:
+                feature_array = df.values.astype(np.float32)
+            outputs = self._onnx_engine.session.run(None, {self._onnx_engine.input_name: feature_array})
+            probabilities = outputs[1][0] if len(outputs) > 1 else None
+        else:
+            probabilities = self._pipeline.predict_proba(df)[0]
+
+        if probabilities is None:
+            stage2_class = int(self._pipeline.predict(df)[0])
+            confidence = 1.0
+        else:
+            stage2_class = int(np.argmax(probabilities))
+            confidence = self._safe_float(np.max(probabilities))
+
+        return {
+            "prediction": stage2_class,
+            "fraud_score": confidence,
+            "anomaly_score": confidence,
+            "confidence": confidence,
+            "risk_level": self._get_risk_level(confidence),
+            "response_time_ms": round((time.perf_counter() - start) * 1000, 2),
+            "model_id": self._loaded_model_id,
+            "anomaly_type": STAGE2_MODEL_CLASSES.get(stage2_class),
+        }
     
     def predict_single(self, features: Dict[str, Any]) -> Dict[str, Any]:
         """Make a single prediction using ONNX or pickle pipeline."""
@@ -390,6 +429,9 @@ class InferenceService:
             raise RuntimeError("No model loaded. Call load_model() first.")
 
         start = time.perf_counter()
+
+        if self._training_stage == "anomaly_type":
+            return self._predict_stage2_direct(features, start)
 
         df = pd.DataFrame([features])
 

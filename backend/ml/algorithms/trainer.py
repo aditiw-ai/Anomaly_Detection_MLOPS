@@ -88,6 +88,9 @@ class FraudDetectionTrainer:
         self.model = None
         self.pipeline = None
         self.feature_names = []
+        self.optimal_threshold = 0.5
+        self.calibrator = None
+        self._is_binary_classifier = None
     
     def train(self, X: pd.DataFrame, y: pd.Series):
         """
@@ -255,6 +258,10 @@ class FraudDetectionTrainer:
             class_labels = getattr(self.model, "classes_", np.arange(y_prob.shape[1]))
             y_pred = np.asarray(class_labels)[np.argmax(y_prob, axis=1)]
             logger.info(f"Multiclass predictions generated via argmax over {y_prob.shape[1]} classes")
+
+        self.optimal_threshold = optimal_threshold
+        self.calibrator = calibrator
+        self._is_binary_classifier = n_classes <= 2
 
         # Compute metrics
         metrics = self._compute_metrics(y_test, y_pred, y_prob)
@@ -1020,10 +1027,17 @@ class FraudDetectionTrainer:
         """Make predictions."""
         if self.pipeline is None:
             raise ValueError("Model not trained")
-            
-        y_pred = self.pipeline.predict(X)
-            
-        return y_pred
+
+        if self._is_binary_classifier:
+            y_prob_raw = self.predict_proba(X)
+            y_prob = (
+                self.calibrator.predict_proba(y_prob_raw.reshape(-1, 1))[:, 1]
+                if self.calibrator is not None
+                else y_prob_raw
+            )
+            return (y_prob >= self.optimal_threshold).astype(int)
+
+        return self.pipeline.predict(X)
     
     def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
         """Get prediction probabilities."""
