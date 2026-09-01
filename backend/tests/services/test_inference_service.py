@@ -2,6 +2,7 @@ import hashlib
 import json
 import pickle
 from pathlib import Path
+from datetime import datetime, timedelta
 
 import pytest
 import numpy as np
@@ -40,6 +41,39 @@ def inference_service():
     InferenceService._instance = None
     service = InferenceService.get_instance()
     return service
+
+
+def test_select_stage2_model_ignores_stale_binary_candidates():
+    now = datetime(2026, 8, 26, 16, 58, 20)
+    stale_binary = MLModel(
+        id=uuid4(),
+        name="Stale Binary Stage 2",
+        status="STAGING",
+        created_at=now - timedelta(days=2),
+        hyperparameters={"training_stage": "anomaly_type", "objective": "binary:logistic"},
+    )
+    older_multiclass = MLModel(
+        id=uuid4(),
+        name="Older Multiclass Stage 2",
+        status="STAGING",
+        created_at=now - timedelta(hours=1),
+        hyperparameters={"training_stage": "anomaly_type", "objective": "multi:softprob", "num_class": 7},
+    )
+    current_multiclass = MLModel(
+        id=uuid4(),
+        name="Current Multiclass Stage 2",
+        status="STAGING",
+        created_at=now,
+        hyperparameters={"training_stage": "anomaly_type", "objective": "multi:softprob", "num_class": 7},
+    )
+
+    selected = InferenceService._select_stage2_model([
+        stale_binary,
+        older_multiclass,
+        current_multiclass,
+    ])
+
+    assert selected == current_multiclass
 
 
 @pytest.mark.asyncio
