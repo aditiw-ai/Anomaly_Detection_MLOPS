@@ -20,7 +20,7 @@ AMOUNT_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 TIMESTAMP_PATTERNS = re.compile(
-    r"(date|time|timestamp|datetime|created|updated|occurred|when|ts\b)",
+    r"(date|time|timestamp|datetime|created|updated|occurred|when|_ts$|^ts$)",
     re.IGNORECASE,
 )
 USER_PATTERNS = re.compile(
@@ -193,7 +193,7 @@ class ColumnRoleDetector:
                 continue
 
             # Categorical: object/string dtype OR low-cardinality numeric
-            if dtype == object or str(dtype) == "category":
+            if pd.api.types.is_object_dtype(dtype) or pd.api.types.is_string_dtype(dtype) or str(dtype) == "category":
                 if df[col].nunique() <= CATEGORY_CARDINALITY_MAX:
                     roles.category_cols.append(col)
                 else:
@@ -221,7 +221,7 @@ class ColumnRoleDetector:
                 continue
 
             # Fallback: try to see if it's a parseable date string
-            if dtype == object:
+            if pd.api.types.is_object_dtype(dtype) or pd.api.types.is_string_dtype(dtype):
                 roles.category_cols.append(col)
                 assigned.add(col)
 

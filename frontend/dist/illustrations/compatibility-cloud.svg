@@ -1,0 +1,31 @@
+<svg width="700" height="420" viewBox="0 0 700 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="680" height="400" rx="18" fill="#F8FBFF" stroke="#DBE7F8"/>
+
+  <ellipse cx="350" cy="206" rx="126" ry="84" fill="#EAF2FF" stroke="#C9DBFF" stroke-width="2"/>
+  <rect x="294" y="174" width="112" height="68" rx="18" fill="#2563EB"/>
+  <rect x="316" y="198" width="68" height="12" rx="6" fill="white"/>
+
+  <rect x="72" y="66" width="150" height="70" rx="12" fill="white" stroke="#D7E4F9"/>
+  <rect x="72" y="172" width="150" height="70" rx="12" fill="white" stroke="#D7E4F9"/>
+  <rect x="72" y="278" width="150" height="70" rx="12" fill="white" stroke="#D7E4F9"/>
+
+  <rect x="478" y="66" width="150" height="70" rx="12" fill="white" stroke="#D7E4F9"/>
+  <rect x="478" y="172" width="150" height="70" rx="12" fill="white" stroke="#D7E4F9"/>
+  <rect x="478" y="278" width="150" height="70" rx="12" fill="white" stroke="#D7E4F9"/>
+
+  <rect x="102" y="95" width="90" height="12" rx="6" fill="#BED5FF"/>
+  <rect x="102" y="201" width="90" height="12" rx="6" fill="#BED5FF"/>
+  <rect x="102" y="307" width="90" height="12" rx="6" fill="#BED5FF"/>
+
+  <rect x="508" y="95" width="90" height="12" rx="6" fill="#BED5FF"/>
+  <rect x="508" y="201" width="90" height="12" rx="6" fill="#BED5FF"/>
+  <rect x="508" y="307" width="90" height="12" rx="6" fill="#BED5FF"/>
+
+  <path d="M222 101C254 123 282 142 300 161" stroke="#AEC4E8" stroke-width="3" stroke-dasharray="6 6"/>
+  <path d="M222 207C260 207 282 207 300 207" stroke="#AEC4E8" stroke-width="3" stroke-dasharray="6 6"/>
+  <path d="M222 313C254 291 282 272 300 253" stroke="#AEC4E8" stroke-width="3" stroke-dasharray="6 6"/>
+
+  <path d="M478 101C446 123 418 142 400 161" stroke="#AEC4E8" stroke-width="3" stroke-dasharray="6 6"/>
+  <path d="M478 207C440 207 418 207 400 207" stroke="#AEC4E8" stroke-width="3" stroke-dasharray="6 6"/>
+  <path d="M478 313C446 291 418 272 400 253" stroke="#AEC4E8" stroke-width="3" stroke-dasharray="6 6"/>
+</svg>
