@@ -18,6 +18,19 @@ logger = logging.getLogger(__name__)
 # Default aggregation windows when not provided
 _DEFAULT_AGG_WINDOWS = ["1h", "24h", "7d"]
 
+# Current-vs-original column pairs used by the deviation feature group.
+# Each entry is skipped gracefully at transform time if either column is
+# absent from the input DataFrame, so this stays safe on other datasets.
+_DEVIATION_ATTRIBUTE_PAIRS = {
+    "price": ("Price In Dollar", "Original Price In Dollar"),
+    "weight": ("Final Weights in Grams", "Original Final Weights in Grams"),
+}
+_DIMENSION_AXES = [
+    ("Length", "Original Length"),
+    ("Width", "Original Width"),
+    ("Height", "Original Height"),
+]
+
 
 class FraudFeatureEngineer(BaseEstimator, TransformerMixin):
     """
@@ -30,6 +43,10 @@ class FraudFeatureEngineer(BaseEstimator, TransformerMixin):
     - Behavioral features — requires *user* + *amount* columns
     - Temporal features — requires a *timestamp* column
     - Aggregation features — requires *user* + *timestamp* + *amount*
+    - Deviation features — current-vs-original comparisons for price,
+      weight, and dimensions (Length/Width/Height), when those column pairs
+      are present. Purely row-wise (no learned statistics), so behaviour is
+      identical between training and single-row inference.
     - Generic numeric features — for every remaining numeric column
     - Generic categorical features — stable ordinal encoding
 
@@ -46,6 +63,7 @@ class FraudFeatureEngineer(BaseEstimator, TransformerMixin):
         * ``temporal_features`` — bool (default True)
         * ``aggregation_features`` — bool (default True)
         * ``aggregation_windows`` — list of window strings (default ``["1h","24h","7d"]``)
+        * ``deviation_features`` — bool (default True)
     """
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
@@ -239,6 +257,9 @@ class FraudFeatureEngineer(BaseEstimator, TransformerMixin):
         if cfg.get("aggregation_features", True):
             self._add_aggregation_features(X, result)
 
+        if cfg.get("deviation_features", True):
+            self._add_deviation_features(X, result)
+
         # Generic features (always on — they cover "remaining" columns)
         self._add_generic_numeric_features(X, result)
         self._add_generic_categorical_features(X, result)
@@ -411,6 +432,71 @@ class FraudFeatureEngineer(BaseEstimator, TransformerMixin):
             out[f"amount_sum_{safe_name}"] = sums.reindex(X.index).fillna(0).astype(np.float32)
 
         logger.debug(f"Added {len(windows) * 2} aggregation features")
+
+    def _add_deviation_features(self, X: pd.DataFrame, out: pd.DataFrame) -> None:
+        """
+        Explicit current-vs-original deviation features for price, weight,
+        and dimensions (Length/Width/Height).
+
+        These directly encode "how much did this attribute change from its
+        baseline", which is what the anomaly-type labels are fundamentally
+        defined by. Purely row-wise arithmetic (no learned statistics), so
+        behaviour is identical for full-batch training and single-row
+        inference. Each attribute pair is skipped gracefully if either the
+        current or original column is absent from the input.
+        """
+        added_any = False
+
+        # --- Simple current-vs-original pairs (price, weight) ---
+        for name, (current_col, original_col) in _DEVIATION_ATTRIBUTE_PAIRS.items():
+            if current_col not in X.columns or original_col not in X.columns:
+                continue
+
+            current = pd.to_numeric(X[current_col], errors="coerce").fillna(0.0)
+            original = pd.to_numeric(X[original_col], errors="coerce").fillna(0.0)
+
+            abs_dev = (current - original).abs()
+            pct_dev = abs_dev / (original.abs() + 1e-6)
+
+            out[f"{name}_deviation_abs"] = abs_dev.astype(np.float32)
+            out[f"{name}_deviation_pct"] = pct_dev.astype(np.float32)
+            out[f"{name}_changed"] = (abs_dev > 1e-6).astype(np.float32)
+            added_any = True
+
+        # --- Dimensions: Length/Width/Height vs their Original counterparts,
+        #     treated as one conceptual "dimensions" attribute in addition
+        #     to per-axis detail, matching the anomaly-type label taxonomy ---
+        dim_abs_devs = []
+        dim_changed_flags = []
+        for current_col, original_col in _DIMENSION_AXES:
+            if current_col not in X.columns or original_col not in X.columns:
+                continue
+
+            current = pd.to_numeric(X[current_col], errors="coerce").fillna(0.0)
+            original = pd.to_numeric(X[original_col], errors="coerce").fillna(0.0)
+
+            abs_dev = (current - original).abs()
+            pct_dev = abs_dev / (original.abs() + 1e-6)
+            axis_name = current_col.lower()
+
+            out[f"{axis_name}_deviation_abs"] = abs_dev.astype(np.float32)
+            out[f"{axis_name}_deviation_pct"] = pct_dev.astype(np.float32)
+
+            dim_abs_devs.append(abs_dev)
+            dim_changed_flags.append(abs_dev > 1e-6)
+
+        if dim_abs_devs:
+            dims_abs_matrix = pd.concat(dim_abs_devs, axis=1)
+            dims_changed_matrix = pd.concat(dim_changed_flags, axis=1)
+
+            out["dimensions_deviation_max"] = dims_abs_matrix.max(axis=1).astype(np.float32)
+            out["dimensions_changed"] = dims_changed_matrix.any(axis=1).astype(np.float32)
+            added_any = True
+
+        if added_any:
+            logger.debug("Added deviation features for price/weight/dimensions")
+        else:
+            logger.debug("Skipping deviation features: no matching current/original column pairs found")
 
     def _add_generic_numeric_features(self, X: pd.DataFrame, out: pd.DataFrame) -> None:
         """Log and z-score for every remaining numeric column."""
