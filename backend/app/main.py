@@ -3,17 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
-import os
-import json
+import asyncio
+
+import redis.asyncio as aioredis
+from sqlalchemy import text
+
 from app.core.config import settings
-
-import asyncio as _asyncio
-
 from app.core.database import init_db, engine
-from app.api.v1 import datasets, training, features
 from app.api.v1 import api_router
 from app.api.v1 import training_logs
 from app.api.v1 import analytics
+from app.core.storage import storage_service
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
                 raise
             delay = 2 ** attempt
             logger.warning("Database init attempt %d failed (%s), retrying in %ds...", attempt, e, delay)
-            await _asyncio.sleep(delay)
+            await asyncio.sleep(delay)
     
     yield
     
@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI):
         logger.error(f"Error closing database: {e}")
 
 app = FastAPI(
-    title="Fraud Detection MLOps Platform",
+    title=settings.APP_NAME,
     swagger_ui_parameters={"persistAuthorization": True},
     version="1.0.0",
     lifespan=lifespan
@@ -59,9 +59,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(datasets.router, prefix="/api/v1")
-app.include_router(training.router, prefix="/api/v1")
-app.include_router(features.router, prefix="/api/v1")
 app.include_router(training_logs.router, prefix="/api/v1")
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
@@ -79,7 +76,37 @@ async def global_exception_handler(request, exc):
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "message": "API is running"}
+    """Report ready only when the platform's required local services respond."""
+    checks = {"database": False, "redis": False, "storage": False}
+    errors = {}
+
+    try:
+        async with engine.connect() as connection:
+            await connection.execute(text("SELECT 1"))
+        checks["database"] = True
+    except Exception as exc:
+        errors["database"] = str(exc)
+
+    redis_client = aioredis.from_url(settings.REDIS_URL, socket_timeout=2)
+    try:
+        checks["redis"] = bool(await redis_client.ping())
+    except Exception as exc:
+        errors["redis"] = str(exc)
+    finally:
+        await redis_client.aclose()
+
+    try:
+        await asyncio.to_thread(storage_service.client.get_account_information)
+        checks["storage"] = True
+    except Exception as exc:
+        errors["storage"] = str(exc)
+
+    ready = all(checks.values())
+    payload = {"status": "healthy" if ready else "unhealthy", "checks": checks}
+    if errors:
+        payload["errors"] = errors
+
+    return JSONResponse(status_code=200 if ready else 503, content=payload)
 
 if __name__ == "__main__":
     import uvicorn

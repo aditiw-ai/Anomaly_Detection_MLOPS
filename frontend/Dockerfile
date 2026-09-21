@@ -2,12 +2,11 @@
 FROM node:20-alpine AS build-stage
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 COPY . .
 # Set API URL to versioned path for backend compatibility
 ENV VITE_API_BASE_URL=/api/v1
-# Use vite build directly to skip strict tsc type-checking errors
-RUN npx vite build
+RUN npm run build
 
 # Production stage
 FROM nginx:stable-alpine
