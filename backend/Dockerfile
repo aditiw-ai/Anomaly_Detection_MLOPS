@@ -30,7 +30,11 @@ COPY --from=ghcr.io/astral-sh/uv:0.8.13 /uv /uvx /bin/
 COPY --from=builder /app/requirements.txt ./
 
 # Upgrade core python packages to fix base image vulnerabilities
-RUN uv pip install --system --no-cache --upgrade pip setuptools wheel>=0.46.2 jaraco.context>=6.1.0
+RUN uv pip install --system --no-cache --upgrade \
+    pip \
+    setuptools \
+    "wheel>=0.46.2" \
+    "jaraco.context>=6.1.0"
 
 # Install application dependencies
 RUN uv pip install --system --no-cache -r requirements.txt
