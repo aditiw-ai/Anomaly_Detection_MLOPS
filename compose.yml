@@ -1,0 +1,156 @@
+name: anomaly-mlops
+
+x-backend-environment: &backend-environment
+  APP_NAME: Anomaly Detection MLOps
+  DEBUG: "false"
+  SECRET_KEY: ${SECRET_KEY:-local-development-secret-change-before-sharing}
+  DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-anomaly}:${POSTGRES_PASSWORD:-anomaly}@postgres:5432/${POSTGRES_DB:-anomaly_mlops}
+  DATABASE_POOL_SIZE: "10"
+  DATABASE_MAX_OVERFLOW: "5"
+  REDIS_URL: redis://redis:6379/0
+  CELERY_BROKER_URL: redis://redis:6379/1
+  CELERY_RESULT_BACKEND: redis://redis:6379/2
+  AZURE_STORAGE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=anomalydev;AccountKey=${AZURITE_ACCOUNT_KEY:-YW5vbWFseS1kZXYtc3RvcmFnZS1rZXktMzItYnl0ZXM=};BlobEndpoint=http://azurite:10000/anomalydev;
+  CORS_ORIGINS: '["http://localhost:3000","http://localhost:5173"]'
+
+x-backend-image: &backend-image
+  image: anomaly-mlops-backend:local
+  environment: *backend-environment
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-anomaly_mlops}
+      POSTGRES_USER: ${POSTGRES_USER:-anomaly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-anomaly}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.35.0
+    environment:
+      AZURITE_ACCOUNTS: anomalydev:${AZURITE_ACCOUNT_KEY:-YW5vbWFseS1kZXYtc3RvcmFnZS1rZXktMzItYnl0ZXM=}
+    command:
+      - azurite-blob
+      - --blobHost
+      - 0.0.0.0
+      - --location
+      - /data
+      - --skipApiVersionCheck
+    ports:
+      - "127.0.0.1:${AZURITE_BLOB_PORT:-10000}:10000"
+    volumes:
+      - azurite_data:/data
+    restart: unless-stopped
+
+  migrate:
+    <<: *backend-image
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  storage-init:
+    <<: *backend-image
+    command: ["python", "scripts/init_storage.py"]
+    depends_on:
+      azurite:
+        condition: service_started
+    restart: "no"
+
+  backend:
+    <<: *backend-image
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      storage-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  celery-worker:
+    <<: *backend-image
+    command:
+      - celery
+      - -A
+      - app.workers.celery_app
+      - worker
+      - --loglevel=info
+      - --queues=features,training,monitoring,celery
+      - --concurrency=1
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      storage-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  celery-beat:
+    <<: *backend-image
+    command:
+      - celery
+      - -A
+      - app.workers.celery_app
+      - beat
+      - --loglevel=info
+      - --schedule=/tmp/celerybeat-schedule
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: anomaly-mlops-frontend:local
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  azurite_data:
